@@ -1,0 +1,42 @@
+.stock-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 16px 0;
+    padding: 16px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.stock-basic {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.upside {
+    font-size: 0.9rem;
+    color: green;
+}
+
+.stock-details {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+.stock-details ul {
+    margin: 8px 0;
+    padding-left: 16px;
+}
+
+.stock-details a {
+    color: #007bff;
+    text-decoration: none;
+}

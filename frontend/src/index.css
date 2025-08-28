@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=PT+Sans+Caption:wght@400;700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Utility font classes */
+.font-cairo {
+  font-family: 'Cairo', sans-serif;
+}
+
+.font-pt-sans {
+  font-family: 'PT Sans Caption', sans-serif;
+}
+
+.font-ubuntu {
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.font-segoe {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
