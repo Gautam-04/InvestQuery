@@ -4,12 +4,12 @@ import requests
 import spacy
 import re
 import json
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 from alpha_vantage.timeseries import TimeSeries
 from alpha_vantage.fundamentaldata import FundamentalData
+import yfinance as yf
 
 
 
@@ -23,7 +23,7 @@ nlp = spacy.load("en_core_web_sm")
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 genai.configure(api_key=os.environ['GEMINI_API_KEY'])
-MODEL = genai.GenerativeModel('gemini-1.5-flash')
+MODEL = genai.GenerativeModel('gemini-2.5-flash')
 
 ALPHA_VANTAGE_KEY = os.getenv("ALPHA_VANTAGE_KEY_2")
 
@@ -87,8 +87,8 @@ def generate_response(prompt):
 def get_country_ticker(stock_symbol, country):
     country = country.strip().lower()
     exchange_mapping = {
-        "india": ".BSE",      
-        "nse": ".BSE",
+        "india": ".NS",      
+        "nse": ".NS",
         "uk": ".LON",           
         "london": ".LON",
         "germany": ".DE",     
@@ -134,7 +134,7 @@ def nlpinput():
     Preferred Country: {', '.join(extracted.get('preferred_country', ['Not specified']))}
     Industry Type: {', '.join(extracted.get('industry_type', ['Not specified']))}
 
-    Example output: ["JPMorgan", "Citibank", "XLF"]
+    Example output: ["HDFCBANK", "Lodha", "AAPL"] return me the tickers name only not full names.
     """
 
     # Call AI model
@@ -155,48 +155,60 @@ def nlpinput():
 
     # Fetch stock data from Alpha Vantage
     for ticker in tickers:
+        print(f"Fetching data for {yf.Ticker(ticker)}...")
         try:
-            url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={ALPHA_VANTAGE_KEY}"
-            r = requests.get(url)
-            data = r.json()
-            print(data)
-            # data, meta = ts.get_quote_endpoint(symbol=ticker)
-            # price = float(data['05. price'])
-            # last_refreshed = data['07. latest trading day']
+            country = countries[0].lower()
+            if "india" in country:
+                # 🇮🇳 Use yfinance
+                yf_ticker = yf.Ticker(ticker)
+                info = yf_ticker.info
 
-            # # Get fundamentals
-            # fundamentals, _ = fd.get_company_overview(ticker)
-            # market_cap = fundamentals.get("MarketCapitalization", "N/A")
-            # pe_ratio = fundamentals.get("PERatio", "N/A")
-            # dividend_yield = fundamentals.get("DividendYield", "N/A")
+                # stock_json = {
+                #     "symbol": ticker.split('.')[0],
+                #     "name": info.get("longName", ticker.split('.')[0]),
+                #     "exchange": "NSE" if ".NS" in ticker or ".BSE" in ticker else "BSE",
+                #     "sector": info.get("sector", "N/A"),
+                #     "current_price": {
+                #         "value": info.get("currentPrice", "N/A"),
+                #         "currency": "INR",
+                #     },
+                #     "details": {
+                #         "market_cap": info.get("marketCap", "N/A"),
+                #         "pe_ratio": info.get("trailingPE", "N/A"),
+                #         "eps": info.get("trailingEps", "N/A"),
+                #         "ebitda": info.get("ebitda", "N/A"),
+                #         "roe": info.get("returnOnEquity", "N/A"),
+                #         "dividend_yield": info.get("dividendYield", "N/A"),
+                #     }
+                # }
 
-            # stock_json = {
-            #     "symbol": ticker.split('.')[0],
-            #     "name": fundamentals.get("Name", ticker.split('.')[0]),
-            #     "exchange": ticker.split('.')[-1],
-            #     "sector": fundamentals.get("Sector", "N/A"),
-            #     "current_price": {
-            #         "value": price,
-            #         "currency": "INR" if countries[0].lower() == "india" else "USD",
-            #         "as_of": last_refreshed
-            #     },
-            #     "details": {
-            #         "market_cap": market_cap,
-            #         "pe_ratio": pe_ratio,
-            #         "dividend_yield": dividend_yield,
-            #         "52_week_high": fundamentals.get("52WeekHigh", "N/A"),
-            #         "52_week_low": fundamentals.get("52WeekLow", "N/A")
-            #     },
-            #     "future_growth": {
-            #         "prediction_years": 2,
-            #         "predicted_values": [],
-            #         "growth_reason": []
-            #     },
-            #     "ratings": [],
-            #     "news": []
-            # }
+            else:
+                # 🇺🇸 or others: use Alpha Vantage
+                url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={ALPHA_VANTAGE_KEY}"
+                r = requests.get(url)
+                fundamentals = r.json()
 
-            structured_data.append(data)
+                stock_json = {
+                    "symbol": fundamentals.get("Symbol", ticker),
+                    "name": fundamentals.get("Name", ticker),
+                    "exchange": ticker.split('.')[-1] if '.' in ticker else "US",
+                    "sector": fundamentals.get("Sector", "N/A"),
+                    "current_price": {
+                        "value": fundamentals.get("50DayMovingAverage", "N/A"),
+                        "currency": "USD",
+                    },
+                    "details": {
+                        "market_cap": fundamentals.get("MarketCapitalization", "N/A"),
+                        "pe_ratio": fundamentals.get("PERatio", "N/A"),
+                        "eps": fundamentals.get("EPS", "N/A"),
+                        "ebitda": fundamentals.get("EBITDA", "N/A"),
+                        "roe": fundamentals.get("ReturnOnEquityTTM", "N/A"),
+                        "dividend_yield": fundamentals.get("DividendYield", "N/A"),
+                    }
+                }
+
+            structured_data.append(info)
+
         except Exception as e:
             print(f"Error fetching {ticker}: {e}")
 
