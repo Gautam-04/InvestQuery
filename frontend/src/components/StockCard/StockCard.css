@@ -1,42 +1,127 @@
 .stock-card {
-    background: #fff;
+    background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 16px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 20px 2rem;
+    transition: all 0.3s ease;
     padding: 16px;
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
 }
 
-.stock-basic {
+.stock-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stock-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
 }
 
-.price {
-    font-weight: bold;
-    color: #007bff;
+.stock-title h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
 }
 
-.upside {
+.stock-title .sector {
+    color: #777;
     font-size: 0.9rem;
-    color: green;
 }
 
+.stock-metrics {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.metric-label {
+    color: #999;
+    font-size: 0.8rem;
+}
+
+.metric-value.price {
+    color: #222;
+    font-weight: 600;
+}
+
+.metric-value.target {
+    color: #0066cc;
+    font-weight: 600;
+}
+
+.metric-value.upside {
+    font-weight: 600;
+}
+
+.metric.up .metric-value.upside {
+    color: #22c55e;
+}
+
+.metric.down .metric-value.upside {
+    color: #ef4444;
+}
+
+.chevron {
+    font-size: 1.2rem;
+    color: #888;
+}
+
+/* 🔹 Details Section */
 .stock-details {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 16px;
     border-top: 1px solid #eee;
+    padding-top: 12px;
     font-size: 0.9rem;
 }
 
-.stock-details ul {
-    margin: 8px 0;
-    padding-left: 16px;
+.stock-details.two-column ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
+    list-style: none;
+    padding: 0;
 }
 
-.stock-details a {
-    color: #007bff;
+.stock-details li strong {
+    color: #444;
+}
+
+.summary {
+    margin-top: 10px;
+    color: #555;
+    line-height: 1.4;
+}
+
+.visit-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: #0066cc;
+    color: white;
     text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.visit-btn:hover {
+    background: #004c99;
+}
+
+/* 🔹 Color coding */
+.good {
+    color: #16a34a !important;
+}
+
+.bad {
+    color: #dc2626 !important;
 }

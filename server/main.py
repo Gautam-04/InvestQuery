@@ -89,14 +89,15 @@ def get_country_ticker(stock_symbol, country):
     exchange_mapping = {
         "india": ".NS",      
         "nse": ".NS",
-        "uk": ".LON",           
-        "london": ".LON",
+        "uk": ".L",           
+        "london": ".L",
         "germany": ".DE",     
-        "china": ".SHH",        
+        "china shanghai": ".SS",        
+        "china shenzhen": ".SZ",
         "japan": ".T",         
-        "canada": ".TRV",      
+        "canada": ".TO",      
         "australia": ".AX", 
-        "uae": ".DFM"         
+        "uae": ".DFM"     
     }
     suffix = exchange_mapping.get(country, "")  
     return stock_symbol + suffix
@@ -158,54 +159,37 @@ def nlpinput():
         print(f"Fetching data for {yf.Ticker(ticker)}...")
         try:
             country = countries[0].lower()
-            if "india" in country:
-                # 🇮🇳 Use yfinance
-                yf_ticker = yf.Ticker(ticker)
-                info = yf_ticker.info
+            yf_ticker = yf.Ticker(ticker)
+            info = yf_ticker.info
+            # if "india" in country:
+            #     # 🇮🇳 Use yfinance
+            #     yf_ticker = yf.Ticker(ticker)
+            #     info = yf_ticker.info
 
-                # stock_json = {
-                #     "symbol": ticker.split('.')[0],
-                #     "name": info.get("longName", ticker.split('.')[0]),
-                #     "exchange": "NSE" if ".NS" in ticker or ".BSE" in ticker else "BSE",
-                #     "sector": info.get("sector", "N/A"),
-                #     "current_price": {
-                #         "value": info.get("currentPrice", "N/A"),
-                #         "currency": "INR",
-                #     },
-                #     "details": {
-                #         "market_cap": info.get("marketCap", "N/A"),
-                #         "pe_ratio": info.get("trailingPE", "N/A"),
-                #         "eps": info.get("trailingEps", "N/A"),
-                #         "ebitda": info.get("ebitda", "N/A"),
-                #         "roe": info.get("returnOnEquity", "N/A"),
-                #         "dividend_yield": info.get("dividendYield", "N/A"),
-                #     }
-                # }
+            # else:
+            #     # 🇺🇸 or others: use Alpha Vantage
+            #     url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={ALPHA_VANTAGE_KEY}"
+            #     r = requests.get(url)
+            #     fundamentals = r.json()
 
-            else:
-                # 🇺🇸 or others: use Alpha Vantage
-                url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={ALPHA_VANTAGE_KEY}"
-                r = requests.get(url)
-                fundamentals = r.json()
-
-                stock_json = {
-                    "symbol": fundamentals.get("Symbol", ticker),
-                    "name": fundamentals.get("Name", ticker),
-                    "exchange": ticker.split('.')[-1] if '.' in ticker else "US",
-                    "sector": fundamentals.get("Sector", "N/A"),
-                    "current_price": {
-                        "value": fundamentals.get("50DayMovingAverage", "N/A"),
-                        "currency": "USD",
-                    },
-                    "details": {
-                        "market_cap": fundamentals.get("MarketCapitalization", "N/A"),
-                        "pe_ratio": fundamentals.get("PERatio", "N/A"),
-                        "eps": fundamentals.get("EPS", "N/A"),
-                        "ebitda": fundamentals.get("EBITDA", "N/A"),
-                        "roe": fundamentals.get("ReturnOnEquityTTM", "N/A"),
-                        "dividend_yield": fundamentals.get("DividendYield", "N/A"),
-                    }
-                }
+            #     stock_json = {
+            #         "symbol": fundamentals.get("Symbol", ticker),
+            #         "name": fundamentals.get("Name", ticker),
+            #         "exchange": ticker.split('.')[-1] if '.' in ticker else "US",
+            #         "sector": fundamentals.get("Sector", "N/A"),
+            #         "current_price": {
+            #             "value": fundamentals.get("50DayMovingAverage", "N/A"),
+            #             "currency": "USD",
+            #         },
+            #         "details": {
+            #             "market_cap": fundamentals.get("MarketCapitalization", "N/A"),
+            #             "pe_ratio": fundamentals.get("PERatio", "N/A"),
+            #             "eps": fundamentals.get("EPS", "N/A"),
+            #             "ebitda": fundamentals.get("EBITDA", "N/A"),
+            #             "roe": fundamentals.get("ReturnOnEquityTTM", "N/A"),
+            #             "dividend_yield": fundamentals.get("DividendYield", "N/A"),
+            #         }
+            #     }
 
             structured_data.append(info)
 
@@ -216,7 +200,7 @@ def nlpinput():
     combined = extracted["amount"] + extracted["risk"] + extracted["domain"] + extracted["duration"] + extracted["preferred_stock_type"] + extracted["preferred_country"] + extracted["industry_type"]
 
     return jsonify({
-        "NLP Extracted Words": combined,
+        "extracted_words": combined,
         "structured_data": structured_data,
         "ai_raw_response": recommendation
     }), 200
