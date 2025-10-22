@@ -1,42 +1,54 @@
+/* =================== Input Container =================== */
 .hero-input-container {
-    background: rgba(40, 40, 40, 0.9);
+    background: #FFF2CE;
+    border: 2px solid #003F63;
     border-radius: 12px;
-    padding: 12px 16px;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
     gap: 10px;
     max-width: 70%;
     margin: 2rem auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 15px rgba(0, 63, 99, 0.15);
+    transition: all 0.3s ease;
 }
 
+.hero-input-container:focus-within {
+    box-shadow: 0 8px 18px rgba(0, 63, 99, 0.25);
+    transform: translateY(-2px);
+}
+
+/* =================== Input Field =================== */
 .hero-input-container input {
     flex: 1;
     background: transparent;
     border: none;
     outline: none;
     font-size: 1rem;
-    color: grey;
+    color: #003F63;
 }
 
 .hero-input-container input::placeholder {
-    color: #aaa;
+    color: rgba(0, 63, 99, 0.6);
 }
 
+/* =================== Button =================== */
 .hero-input-btn {
-    background: transparent;
+    background: #003F63;
     border: none;
-    color: #4cc9f0;
     cursor: pointer;
     font-size: 0;
     opacity: 0;
+    padding: 8px;
+    border-radius: 50%;
     transform: translateX(-10px);
-    transition: opacity 0.6s ease, transform 0.6s ease, color 0.3s ease;
+    transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s ease, scale 0.2s ease;
+}
 
-    .icon {
-        width: 2rem;
-        height: 2rem;
-    }
+.hero-input-btn .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #FFF2CE;
 }
 
 .hero-input-btn.show {
@@ -51,12 +63,13 @@
 }
 
 .hero-input-btn:hover {
-    color: #00bfff;
-    transform: scale(1.2);
+    background: #002540;
+    scale: 1.1;
 }
 
+/* =================== Tags Section =================== */
 .tags-container {
-    margin: 1rem auto;
+    margin: 1.5rem auto;
     width: 70%;
     display: flex;
     flex-wrap: wrap;
@@ -67,27 +80,45 @@
 .tag {
     display: flex;
     align-items: center;
-    background: #239ba7;
+    background: #003F63;
     color: white;
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 1rem;
+    padding: 8px 14px;
+    border-radius: 14px;
+    font-size: 0.95rem;
     font-weight: 500;
-    cursor: default;
     transition: transform 0.2s ease, background 0.3s ease;
 }
 
 .tag:hover {
-    background: #1a7c85;
+    background: #002540;
+    transform: translateY(-2px);
 }
 
 .tag-close {
     margin-left: 8px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.1rem;
     transition: color 0.2s ease;
 }
 
 .tag-close:hover {
+    color: #FFF2CE;
+}
+
+/* =================== No Results / Loading =================== */
+.loading-text,
+.no-results-text,
+.error-text {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1rem;
+    color: #003F63;
+}
+
+.error-text {
     color: red;
+}
+
+.stock-cards {
+    margin-top: 2rem;
 }

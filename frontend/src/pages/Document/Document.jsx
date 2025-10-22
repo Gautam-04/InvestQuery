@@ -81,7 +81,7 @@ const [file, setFile] = useState(null);
         <div className="loader"></div>
       ) : (
         <>
-          <span>🚀</span> Upload & Analyze
+           Upload & Analyze
         </>
       )}
     </button>
@@ -92,10 +92,18 @@ const [file, setFile] = useState(null);
   {result && (
     <div className="result-box fade-in">
       <h2>AI Analysis Result</h2>
-      <ReactMarkdown>{result}</ReactMarkdown>
+      
+      {/* Convert result into bullet list by splitting on newlines */}
+      <ul className="analysis-list">
+        {result.split('\n').filter(line => line.trim() !== '').map((line, index) => (
+          <li key={index}>
+            <ReactMarkdown>{line}</ReactMarkdown>
+          </li>
+        ))}
+      </ul>
     </div>
-  )}
-</div>
+    )}
+  </div>
 
   );
 }

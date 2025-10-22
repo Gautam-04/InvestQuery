@@ -29,13 +29,13 @@ function Footer() {
         <div className="footer-social">
           <h4 className="footer-heading">Connect With Us</h4>
           <div className="social-icons">
-            <a href="#" target="_blank" rel="noopener noreferrer" className="social-link">
+            <a href="#" rel="noopener noreferrer" className="social-link">
               <AiFillFacebook className="social-icon" />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="social-link">
+            <a href="#"  rel="noopener noreferrer" className="social-link">
               <AiFillGithub className="social-icon" />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="social-link">
+            <a href="#" rel="noopener noreferrer" className="social-link">
               <AiFillGoogleCircle className="social-icon" />
             </a>
           </div>
