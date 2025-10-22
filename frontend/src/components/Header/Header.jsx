@@ -1,34 +1,39 @@
-import './Header.css'
-import { RiStockLine } from "react-icons/ri";
-import { AiFillGithub,AiFillGoogleCircle,AiFillFacebook } from "react-icons/ai";
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RiStockLine } from "react-icons/ri";
+import './Header.css';
 
 function Header() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  
   return (
-    <section className='HeaderSections'>
-        <div className="LogoContainer" onClick={()=>navigate("/")}>
-            <div className="LogoDiv">
-                <RiStockLine className='LogoIcon'/>
-            </div>
-            <div className="LogoTitle">
-                <h1 className="ProjectName font-ubuntu">InvestQuery</h1>
-            </div>
+    <header className="header">
+      {/* Logo Section */}
+      <div className="logo-container" onClick={() => navigate("/")}>
+        <div className="logo-div">
+          <RiStockLine className="logo-icon" />
         </div>
+        <div className="logo-title">
+          <h1 className="project-name font-ubuntu">InvestQuery</h1>
+        </div>
+      </div>
 
-        <div className="ContactContainer">
-            <div className="LogoDiv">
-                <AiFillFacebook className='ContactLogo' />
-            </div>
-            <div className="LogoDiv">
-                <AiFillGithub className='ContactLogo' />
-            </div>
-            <div className="LogoDiv">
-                <AiFillGoogleCircle className='ContactLogo' />
-            </div>
-        </div>
-    </section>
-  )
+      {/* Navigation Links */}
+      <nav className="nav-links">
+        <button onClick={() => navigate("/about")} className="nav-link">
+          About
+        </button>
+        
+        <button onClick={() => navigate("/result")} className="nav-link">
+          Invest With Us
+        </button>
+        
+        <button onClick={() => navigate("/document")} className="nav-link">
+          Document Analysis
+        </button>
+      </nav>
+    </header>
+  );
 }
 
-export default Header
+export default Header;

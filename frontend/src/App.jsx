@@ -3,21 +3,23 @@ import Home from "./pages/Home/Home"
 import Header from "./components/Header/Header"
 import Result from "./pages/result/Result"
 import Document from "./pages/Document/Document"
+import About from "./pages/About/About"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Footer from "./components/Footer/Footer"
 
 function App() {
-
   return (
-    <>
-    <Header />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/result" element={<Result />} />
-      <Route path="/document" element={<Document />} />
-    </Routes>
-    <ToastContainer
+    <div className="app-container">
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/result" element={<Result />} />
+        <Route path="/document" element={<Document />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+
+      <ToastContainer
         position="bottom-center"
         autoClose={5000}
         hideProgressBar={false}
@@ -29,8 +31,11 @@ function App() {
         pauseOnHover
         theme="colored"
       />
-    </>
-  )
+
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;
+

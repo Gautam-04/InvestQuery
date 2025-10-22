@@ -1,75 +1,148 @@
-.HeaderSections {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-    background-color: #ECECBB;
-    transition: background-color 0.3s ease;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: #FFF2CE;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.LogoContainer {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
+/* Logo Section */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
-.LogoContainer:hover {
-    transform: scale(1.05);
+.logo-container:hover {
+  transform: scale(1.05);
 }
 
-.LogoDiv {
-    width: 40px;
-    height: 40px;
-    border-radius: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+.logo-div {
+  width: 40px;
+  height: 40px;
+  border-radius: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.LogoDiv:hover {
-    background-color: #d1f3f6;
+.logo-div:hover {
+  background-color: rgba(0, 63, 99, 0.1);
 }
 
-.LogoIcon {
-    width: 100%;
-    height: 100%;
-    color: #239BA7;
-    transition: color 0.3s ease;
+.logo-icon {
+  width: 100%;
+  height: 100%;
+  color: #003F63;
+  transition: color 0.3s ease;
 }
 
-.LogoIcon:hover {
-    color: #197782;
+.logo-icon:hover {
+  color: rgba(0, 63, 99, 0.8);
 }
 
-.ProjectName {
-    font-size: 24px;
-    font-weight: 700;
-    color: #239BA7;
-    transition: color 0.3s ease;
+.logo-title {
+  display: flex;
+  align-items: center;
 }
 
-.ProjectName:hover {
-    color: #197782;
+.project-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #003F63;
+  margin: 0;
+  transition: color 0.3s ease;
 }
 
-.ContactContainer {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.project-name:hover {
+  color: rgba(0, 63, 99, 0.8);
 }
 
-.ContactLogo {
-    width: 24px;
-    height: 24px;
-    color: #7ADAA5;
-    cursor: pointer;
-    transition: transform 0.3s ease, color 0.3s ease;
+/* Navigation */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
-.ContactLogo:hover {
-    color: #56a67a;
-    transform: scale(1.2) rotate(5deg);
+.nav-link {
+  background: none;
+  border: none;
+  color: #003F63;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+  padding: 0.25rem 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  display: inline-block;
+  text-decoration: none;
+  outline: none;
+}
+
+.nav-link::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background-color: #003F63;
+  left: 0;
+  bottom: -4px;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  opacity: 0.7;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-btn-primary {
+  padding: 0.625rem 1.25rem;
+  background-color: #003F63;
+  color: #FFF2CE;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 63, 99, 0.2);
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+.nav-btn-primary:hover {
+  background-color: rgba(0, 63, 99, 0.9);
+  box-shadow: 0 6px 12px rgba(0, 63, 99, 0.3);
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
+
+  .nav-link,
+  .nav-btn-primary {
+    font-size: 0.875rem;
+  }
+
+  .project-name {
+    font-size: 1.25rem;
+  }
 }
