@@ -10,7 +10,12 @@ from dotenv import load_dotenv
 from alpha_vantage.timeseries import TimeSeries
 from alpha_vantage.fundamentaldata import FundamentalData
 import yfinance as yf
-
+from PyPDF2 import PdfReader
+import pandas as pd
+import os
+import tempfile
+from docx import Document
+from pytrends.request import TrendReq
 
 
 load_dotenv()
@@ -29,6 +34,11 @@ ALPHA_VANTAGE_KEY = os.getenv("ALPHA_VANTAGE_KEY_2")
 
 ts = TimeSeries(key=ALPHA_VANTAGE_KEY, output_format='json')
 fd = FundamentalData(key=ALPHA_VANTAGE_KEY, output_format='json')
+# pytrends = TrendReq(hl='en-US', tz=360)
+
+# Get top daily trending searches (India example)
+# daily_trends = pytrends.trending_searches(pn='india')
+# print(daily_trends.head())
 
 
 # Extract money (like "10,000 rupees" / "$500")
@@ -102,6 +112,20 @@ def get_country_ticker(stock_symbol, country):
     suffix = exchange_mapping.get(country, "")  
     return stock_symbol + suffix
 
+# =========================================================
+# ------------------ Trends Based Search ------------------
+# =========================================================
+
+@app.route('/trends', methods=['GET'])
+def get_trends():
+    try:
+        url = f"https://www.alphavantage.co/query?function=SECTOR&apikey={ALPHA_VANTAGE_KEY}"
+        r = requests.get(url)
+        data = r.json()
+        return jsonify(data), 200
+    except Exception as e:
+        print("Error fetching trends:", e)
+        return jsonify({"error": "Failed to fetch trends"}), 500
 
 @app.route('/api/nlpinput', methods=['POST'])
 def nlpinput():
@@ -204,6 +228,141 @@ def nlpinput():
         "structured_data": structured_data,
         "ai_raw_response": recommendation
     }), 200
+
+
+# =========================================================
+# ------------------ FILE UPLOAD HANDLER ------------------
+# =========================================================
+def extract_text_from_file(file_path):
+    ext = os.path.splitext(file_path)[1].lower()
+
+    if ext == ".pdf":
+        reader = PdfReader(file_path)
+        text = " ".join(page.extract_text() for page in reader.pages if page.extract_text())
+        return text
+
+    elif ext == ".docx":
+        doc = Document(file_path)
+        return "\n".join(p.text for p in doc.paragraphs)
+
+    elif ext in [".csv", ".xlsx"]:
+        df = pd.read_excel(file_path) if ext == ".xlsx" else pd.read_csv(file_path)
+        return df.to_string(index=False)
+
+    elif ext == ".txt":
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+
+    else:
+        return "Unsupported file format."
+
+def analyze_document(content, question=None):
+    if question:
+        prompt = f"""
+You are an expert financial analyst AI assistant.
+
+The following is a financial document (could be a report, statement, or dataset).
+You will answer the user's question based **strictly** based on the document's content.
+If any data is missing, mention that clearly without guessing.
+
+---
+### 🧾 Document Content:
+{content}
+
+---
+### ❓ User Question:
+{question}
+
+---
+### 🎯 Instructions:
+- Provide a **comprehensive, structured, and well-formatted** answer in **Markdown**.
+- Include:
+  - Relevant **tables** (if numeric data is available)
+  - **Comparative analysis** between years, quarters, or categories
+  - **Percentage changes, growth trends, and ratios** when applicable
+  - **Color-coded indicators** (using emojis like 🟢 for positive growth, 🔴 for decline, 🟡 for neutral)
+  - **Key financial metrics** (Revenue, Profit, Expenses, Margins, etc.)
+  - **Actionable insights** in bullet points
+- End with a **short conclusion** summarizing the key takeaways.
+"""
+    else:
+        prompt = """
+You are a senior financial report analyst AI.
+You are given one or more financial or business documents.
+
+Your task is to generate a **comprehensive and visually rich Markdown summary** that helps a reader quickly understand the key financial story.
+
+---
+### 📄 Document Content:
+{content}
+
+---
+### 🧠 Your Output Must Include:
+1. **Executive Summary** — 3–5 sentences highlighting the overall performance.
+2. **Financial Highlights Table** — Include metrics like Revenue, Profit, Expenses, EPS, YoY Growth, etc.  
+   If the data is missing, infer the structure from context.
+3. **Growth & Trend Analysis** — Identify:
+   - Positive trends 🟢  
+   - Declines 🔴  
+   - Stable areas 🟡  
+   Use arrows (⬆️ ⬇️ ➡️) to represent movements.
+4. **Sentiment & Tone Summary** — Determine if the report tone is optimistic, neutral, or negative.
+5. **Risk & Outlook Section** — Mention key risks, warnings, or opportunities.
+6. **Graphical Hints (textual)** — Represent bar or line graph trends using simple ASCII bars or emoji (example: 📈📉).
+7. **Well-Spaced Markdown Layout** — Use proper headings, bold, bullet points, and spacing for readability.
+
+---
+### ⚙️ Formatting Rules:
+- Use Markdown headings (##, ###)
+- Use tables for numerical data
+- Keep tone analytical and professional
+- Avoid generic filler text — always tie insights back to the document
+- If document is large, summarize each section individually before concluding
+"""
+
+    response = MODEL.generate_content(prompt)
+    return response.text.strip()
+
+@app.route("/api/uploadDoc", methods=["POST"])
+def uploadDoc():
+    try:
+        # Get uploaded file
+        file = request.files['file']
+        question = request.form.get('question', '')
+
+        # Save file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp:
+            temp_path = temp.name
+            file.save(temp_path)
+
+        # Close the file before re-opening (important for Windows!)
+        extracted_text = extract_text_from_file(temp_path)
+
+        # Combine question + document text
+        prompt = f"""
+        You are a financial analyst AI.
+        The following document contains financial data or reports.
+
+        If the user has asked a question, answer it based on the document.
+        If not, summarize the key financial highlights, performance, and trends.
+
+        Question: {question}
+
+        Document content:
+        {extracted_text[:4000]}  # limit to avoid token overflow
+        """
+
+        response = MODEL.generate_content(prompt)
+        ai_text = response.text
+
+        # Clean up temporary file
+        os.remove(temp_path)
+
+        return jsonify({"result": ai_text})
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

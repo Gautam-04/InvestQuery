@@ -1,7 +1,8 @@
 import { Route, Routes } from "react-router-dom"
 import Home from "./pages/Home/Home"
 import Header from "./components/Header/Header"
-import Result from "./pages/result/result"
+import Result from "./pages/result/Result"
+import Document from "./pages/Document/Document"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,6 +15,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/result" element={<Result />} />
+      <Route path="/document" element={<Document />} />
     </Routes>
     <ToastContainer
         position="bottom-center"

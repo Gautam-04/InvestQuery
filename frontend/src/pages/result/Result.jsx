@@ -89,6 +89,11 @@ function Result() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit();
+            }
+          }}
           placeholder="I want to invest ₹10,000 in low-risk stocks for 2 years..."
         />
         <button
