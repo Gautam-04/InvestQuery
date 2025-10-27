@@ -28,8 +28,8 @@ function Header() {
           Invest With Us
         </button>
         
-        <button onClick={() => navigate("/document")} className="nav-link">
-          Document Analysis
+        <button onClick={() => navigate("/assistant")} className="nav-link">
+          Ai Assistant
         </button>
       </nav>
     </header>

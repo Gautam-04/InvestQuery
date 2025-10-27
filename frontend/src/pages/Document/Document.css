@@ -1,4 +1,4 @@
-.upload-card {
+/* .upload-card {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(15px);
     border-radius: 20px;
@@ -9,7 +9,7 @@
     animation: fadeIn 0.6s ease-in-out;
 }
 
-/* TITLES */
+
 .form-title {
     font-size: 2rem;
     font-weight: 700;
@@ -27,12 +27,12 @@
     font-weight: 400;
 }
 
-/* FORM GROUP SPACING */
+
 .form-group {
     margin-bottom: 1.8rem;
 }
 
-/* LABELS */
+
 .file-label,
 .question-label {
     display: block;
@@ -42,7 +42,7 @@
     font-size: 1rem;
 }
 
-/* INPUTS */
+
 .file-input,
 .question-box {
     display: block;
@@ -68,7 +68,7 @@
     box-shadow: 0 0 8px rgba(0, 63, 99, 0.35);
 }
 
-/* BUTTON */
+
 .upload-btn {
     display: flex;
     align-items: center;
@@ -97,7 +97,7 @@
     transform: none;
 }
 
-/* LOADER */
+
 .loader {
     border: 3px solid #f3f3f3;
     border-top: 3px solid white;
@@ -107,7 +107,7 @@
     animation: spin 1s linear infinite;
 }
 
-/* RESULT */
+
 .result-box {
     background: #f8f9fa;
     border: 1px solid #dde1e7;
@@ -123,7 +123,7 @@
     font-size: 1.4rem;
 }
 
-/* ERROR */
+
 .error-box {
     background: #ffe6e6;
     color: #c00;
@@ -135,7 +135,7 @@
     font-weight: 500;
 }
 
-/* EFFECTS */
+
 .fade-in {
     animation: fadeIn 0.7s ease-in-out;
 }
@@ -166,4 +166,4 @@
     margin-bottom: 0.8rem;
     color: #003F63;
     font-size: 1rem;
-}
+} */

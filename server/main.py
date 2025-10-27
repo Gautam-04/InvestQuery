@@ -16,6 +16,12 @@ import os
 import tempfile
 from docx import Document
 from pytrends.request import TrendReq
+from rag_utils import build_index_from_text, retrieve_relevant_chunks
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import FAISS
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.chains import RetrievalQA
+from langchain.docstore.document import Document
 
 
 load_dotenv()
@@ -34,11 +40,102 @@ ALPHA_VANTAGE_KEY = os.getenv("ALPHA_VANTAGE_KEY_2")
 
 ts = TimeSeries(key=ALPHA_VANTAGE_KEY, output_format='json')
 fd = FundamentalData(key=ALPHA_VANTAGE_KEY, output_format='json')
-# pytrends = TrendReq(hl='en-US', tz=360)
 
-# Get top daily trending searches (India example)
-# daily_trends = pytrends.trending_searches(pn='india')
-# print(daily_trends.head())
+def extract_text_from_pdf(path):
+    reader = PdfReader(path)
+    return "\n".join([page.extract_text() or "" for page in reader.pages])
+
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    question = request.form.get("question", "")
+
+    # Case 1: File uploaded → Document-based QA
+    if "file" in request.files:
+        file = request.files["file"]
+        with tempfile.NamedTemporaryFile(delete=False) as temp:
+            file.save(temp.name)
+            text = extract_text_from_pdf(temp.name)
+
+        # Split and embed
+        splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+        docs = [Document(page_content=t) for t in splitter.split_text(text)]
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        vectorstore = FAISS.from_documents(docs, embeddings)
+        retriever = vectorstore.as_retriever()
+
+        # Get top context
+        related_docs = retriever.get_relevant_documents(question or "summarize financial performance")
+        context = "\n".join([d.page_content for d in related_docs])
+
+        prompt = f"""
+        You are an expert financial analyst AI assistant.
+
+The following is a financial document (could be a report, statement, or dataset).
+You will answer the user's question based **strictly** based on the document's content.
+If any data is missing, mention that clearly without guessing.
+
+---
+### 🧾 Document Content:
+{context}
+
+---
+### ❓ User Question:
+{question}
+
+---
+### 🎯 Instructions:
+- Provide a **comprehensive, structured, and well-formatted** answer in **Markdown**.
+- Include:
+  - Relevant **tables** (if numeric data is available)
+  - **Comparative analysis** between years, quarters, or categories
+  - **Percentage changes, growth trends, and ratios** when applicable
+  - **Color-coded indicators** (using emojis like 🟢 for positive growth, 🔴 for decline, 🟡 for neutral)
+  - **Key financial metrics** (Revenue, Profit, Expenses, Margins, etc.)
+  - **Actionable insights** in bullet points
+  - Please format the response using markdown syntax for better readability. If adding table try to have better formatting. the current formating is bad.
+- End with a **short conclusion** summarizing the key takeaways.
+"""
+        answer = MODEL.generate_content(prompt)
+        return jsonify({"answer": answer.text})
+
+    # Case 2: No file → Financial MCQ or Recommendation Generation
+    elif question:
+        prompt = f"""
+You are an expert AI Financial Analyst.
+
+Your task is to analyze the following query and generate a structured professional response.
+
+Query: "{question}"
+
+### 🔹 Related Analytical MCQs
+Generate **3 high-quality multiple-choice questions** related to this topic for learning or assessment purposes.  
+Each question must have:
+- 1 correct answer  
+- 3 plausible distractors  
+
+Use **clear markdown formatting**:
+- Each question in **bold**  
+- Each option (A, B, C, D) must appear on a **new line**  and bold the options (A, B, C, D) as well.
+- Add one blank line between questions  
+- Highlight the correct answer with a ✅ emoji at the end  
+
+**Output Format Example:**
+
+**Q1. What is the primary purpose of creating a personal budget?**  
+A. To increase your investment returns immediately.  
+B. To track your income and expenses to manage your money effectively.  
+C. To eliminate all your debts instantly.  
+D. To predict future stock market movements.  
+✅ **Correct Answer:** B  
+
+Ensure the tone is **formal**, **data-driven**, and clearly formatted for web display.
+"""
+
+
+        answer = MODEL.generate_content(prompt)
+        return jsonify({"answer": answer.text})
+
+    return jsonify({"answer": "Please upload a document or provide a question."})
 
 
 # Extract money (like "10,000 rupees" / "$500")
@@ -322,6 +419,7 @@ Your task is to generate a **comprehensive and visually rich Markdown summary** 
 
     response = MODEL.generate_content(prompt)
     return response.text.strip()
+
 
 @app.route("/api/uploadDoc", methods=["POST"])
 def uploadDoc():
